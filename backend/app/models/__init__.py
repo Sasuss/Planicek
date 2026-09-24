@@ -6,3 +6,5 @@ class Base(DeclarativeBase):
 
 
 __all__ = ["Base"]
+
+# importy modelu (tabulek)
