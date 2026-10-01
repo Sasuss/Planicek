@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-
+#https://docs.sqlalchemy.org/en/21/orm/quickstart.html
 from app.config import settings
 
 engine = create_async_engine(

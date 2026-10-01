@@ -2,13 +2,23 @@ import { useState } from 'react'
 import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
+import {useEffect} from "react";
 import './App.css'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [apiResponse, setApiResponse] = useState([])
 
+  useEffect(() => {
+    fetch("/api/health").then((data) => data.json()).then((data) => {
+      setApiResponse(data)
+    })
+  });
+
+  //console.log(apiResponse)
   return (
     <>
+      <span>{JSON.stringify(apiResponse)}</span>
       <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
