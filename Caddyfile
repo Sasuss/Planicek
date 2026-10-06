@@ -14,7 +14,6 @@
 		try_files {path} /index.html
 		file_server
 	}
-
 	header {
 		-Server
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"

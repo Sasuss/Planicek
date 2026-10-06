@@ -1,10 +1,18 @@
+"""
+Here SQL tables will be imported for alembic to registrate
+"""
+
+
 from sqlalchemy.orm import DeclarativeBase
 
 
 class Base(DeclarativeBase):
+    """
+    Class for registering DB models, one table = one model
+    """
     pass
 
 
-__all__ = ["Base"]
+from .user import User
 
-# importy modelu (tabulek)
+__all__ = ["Base", "User"]
