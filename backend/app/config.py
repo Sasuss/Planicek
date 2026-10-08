@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     postgres_db: str
     postgres_user: str
     postgres_password: str
+    google_client_id: str
+    google_client_secret: str
 
     # Source of the variables
     model_config = SettingsConfigDict(
