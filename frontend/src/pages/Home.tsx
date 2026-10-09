@@ -6,28 +6,32 @@ function Home() {
     const [count, setCount] = useState(0)
     return (
         <>
-            <div id="g_id_onload"
-                 data-client_id="463986232644-712ajfdttp89jv2ld3hrdq8klvo936if.apps.googleusercontent.com"
-                 data-context="signin"
-                 data-ux_mode="popup"
-                 data-callback="handleGoogleAuth"
-                 data-auto_prompt="false">
-            </div>
+            <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-            <div className="g_id_signin"
-                 data-type="standard"
-                 data-shape="pill"
-                 data-theme="outline"
-                 data-text="continue_with"
-                 data-size="large"
-                 data-logo_alignment="left">
-            </div>
+            <a href={"/authenticate"} target="_blank" rel="noopener noreferrer">burdys</a>
+
             <script src="https://accounts.google.com/gsi/client" async></script>
             <section id="center">
                 <div className="hero">
                     <img src={heroImg} className="base" width="170" height="179" alt=""/>
                     <img src={reactLogo} className="framework" alt="React logo"/>
                     <img src={viteLogo} className="vite" alt="Vite logo"/>
+                </div>
+                <div id="g_id_onload"
+                     data-client_id="463986232644-712ajfdttp89jv2ld3hrdq8klvo936if.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="redirect"
+                     data-login_uri="/authenticate"
+                     data-auto_prompt="false">
+                </div>
+
+                <div className="g_id_signin"
+                     data-type="standard"
+                     data-shape="pill"
+                     data-theme="outline"
+                     data-text="signin_with"
+                     data-size="large"
+                     data-logo_alignment="left">
                 </div>
                 <div>
                     <h1>Get started</h1>
@@ -54,7 +58,7 @@ function Home() {
                     <h2>Documentation</h2>
                     <p>Your questions, answered</p>
                     <ul>
-                        <li>
+                    <li>
                             <a href="https://vite.dev/" target="_blank">
                                 <img className="logo" src={viteLogo} alt=""/>
                                 Explore Vite

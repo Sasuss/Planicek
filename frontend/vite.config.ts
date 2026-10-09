@@ -20,6 +20,9 @@ export default defineConfig({
     }), tailwindcss(),
   ],
   server: {
-    proxy: { "/api": "http://localhost:8000"}
+    proxy: { "/api": "http://localhost:8000",
+      "/authenticate": "http://localhost:8000",
+
+    }
   }
 })

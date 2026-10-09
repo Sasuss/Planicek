@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 from app.database import engine
+from app.routers import authenticate
 
 
 app = FastAPI(
@@ -16,7 +17,7 @@ app = FastAPI(
         },
     ],
 )
-
+app.include_router(authenticate.router)
 
 @app.get("/api/health", tags=["system"])
 async def health() -> dict:
