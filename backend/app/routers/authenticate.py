@@ -1,11 +1,15 @@
 """
 Google oauth
 """
-from fastapi import APIRouter, Form, HTTPException, Request
+from fastapi import APIRouter, Form, HTTPException, Request, Depends
 from google.oauth2 import id_token
 from google.auth.transport import requests
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
 from app.config import settings
+from app.database import get_db
+from app.models import User
 
 
 router = APIRouter(
@@ -15,16 +19,17 @@ router = APIRouter(
 
 
 @router.post("")
-def authenticate(
+async def authenticate(
         request: Request,
         credential: str = Form(...),
         g_csrf_token: str = Form(...),
+        db: AsyncSession = Depends(get_db),
 ):
     """
-
     :param request: cookie request
     :param credential: return from Google oauth2 used for verifying user credentials
     :param g_csrf_token: return from Google oauth2 currently unused
+    :param db: database session
     :return:
         status: success - if verification went through
         user_id: user_id - user id from Google oauth2
@@ -51,10 +56,29 @@ def authenticate(
         # during account lookup. Email is not a good choice because it can be changed by the user.
         userid = idinfo['sub']
         email = idinfo.get('email')
+        name = idinfo.get('given_name')
+        surname = idinfo.get('family_name')
+        avatar_url = idinfo.get('picture')
+
+
+
+        result = await db.execute(select(User).where(User.google_id == userid))
+        if result.scalar() is None:
+            user = User(
+                google_id=userid,
+                email=email,
+                display_name=name,
+                family_name=surname,
+                avatar_url=avatar_url,
+            )
+            db.add(user)
+            await db.commit()
+
     except ValueError as e:
         # Invalid token
         raise HTTPException(status_code=400, detail=f"Invalid authentication token: {e}")
     return {
+        "return": idinfo,
         "stauts": "success",
         "user_id": userid,
         "email": email

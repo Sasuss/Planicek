@@ -13,7 +13,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, nullable=False)
     google_id: Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    email: Mapped[str|None] = mapped_column(String, unique=True, nullable=True)
     display_name: Mapped[str|None] = mapped_column(String, nullable=True)
     family_name: Mapped[str|None] = mapped_column(String, nullable=True)
     avatar_url: Mapped[str|None] = mapped_column(String, nullable=True)
