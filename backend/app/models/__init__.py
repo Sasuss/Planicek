@@ -14,5 +14,6 @@ class Base(DeclarativeBase):
 
 
 from .user import User
+from .session import Session
 
-__all__ = ["Base", "User"]
+__all__ = ["Base", "User", "Session"]

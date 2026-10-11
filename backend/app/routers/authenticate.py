@@ -1,7 +1,7 @@
 """
 Google oauth
 """
-from fastapi import APIRouter, Form, HTTPException, Request, Depends
+from fastapi import APIRouter, Form, HTTPException, Request, Depends, Response
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,7 +10,9 @@ from sqlalchemy import select
 from app.config import settings
 from app.database import get_db
 from app.models import User
+from app.models import Session
 
+import secrets
 
 router = APIRouter(
     prefix="/authenticate",
@@ -20,12 +22,14 @@ router = APIRouter(
 
 @router.post("")
 async def authenticate(
+        response: Response,
         request: Request,
         credential: str = Form(...),
         g_csrf_token: str = Form(...),
         db: AsyncSession = Depends(get_db),
 ):
     """
+    :param response: fastapi response for setting cookies
     :param request: cookie request
     :param credential: return from Google oauth2 used for verifying user credentials
     :param g_csrf_token: return from Google oauth2 currently unused
@@ -60,10 +64,9 @@ async def authenticate(
         surname = idinfo.get('family_name')
         avatar_url = idinfo.get('picture')
 
-
-
         result = await db.execute(select(User).where(User.google_id == userid))
-        if result.scalar() is None:
+        user = result.scalar_one_or_none()
+        if user is None:
             user = User(
                 google_id=userid,
                 email=email,
@@ -77,6 +80,22 @@ async def authenticate(
     except ValueError as e:
         # Invalid token
         raise HTTPException(status_code=400, detail=f"Invalid authentication token: {e}")
+    token = secrets.token_urlsafe(32)
+
+    session = Session(
+        user_id = user.id,
+        session_id = token,
+    )
+    db.add(session)
+    await db.commit()
+
+    response.set_cookie(
+        "login_session",
+        token,
+        60 * 60 * 24 * 30,
+        httponly=True,
+        samesite="lax",
+    )
     return {
         "return": idinfo,
         "stauts": "success",
