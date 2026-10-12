@@ -19,6 +19,14 @@ router = APIRouter(
     tags=["authenticate"],
 )
 
+@router.post("/verify_token", tags=["authenticate"])
+async def verify_token(token: str):
+    """
+
+    :param token:
+    """
+
+
 
 @router.post("")
 async def authenticate(
@@ -76,26 +84,34 @@ async def authenticate(
             )
             db.add(user)
             await db.commit()
+            token = secrets.token_urlsafe(32)
+
+            session = Session(
+                user_id=user.id,
+                session_id=token,
+            )
+            db.add(session)
+            await db.commit()
+        else:
+            token = await db.execute(select(Session.session_id).where(Session.user_id == user.id).limit(1))
+            token = token.scalar_one_or_none()
+            if token is None:
+                raise HTTPException(status_code=400, detail="Invalid session id, try logging in again")
+
+        response.set_cookie(
+            "login_session",
+            token,
+            60 * 60 * 24 * 30,
+            httponly=True,
+            samesite="lax",
+        )
 
     except ValueError as e:
         # Invalid token
         raise HTTPException(status_code=400, detail=f"Invalid authentication token: {e}")
-    token = secrets.token_urlsafe(32)
 
-    session = Session(
-        user_id = user.id,
-        session_id = token,
-    )
-    db.add(session)
-    await db.commit()
 
-    response.set_cookie(
-        "login_session",
-        token,
-        60 * 60 * 24 * 30,
-        httponly=True,
-        samesite="lax",
-    )
+
     return {
         "return": idinfo,
         "stauts": "success",

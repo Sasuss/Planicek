@@ -8,8 +8,7 @@ function Home() {
         <>
             <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-            <a href={"/authenticate"} target="_blank" rel="noopener noreferrer">burdys</a>
-
+            <button>Verify login</button>
             <script src="https://accounts.google.com/gsi/client" async></script>
             <section id="center">
                 <div className="hero">
