@@ -1,11 +1,13 @@
 """
 Google oauth
 """
+
 from fastapi import APIRouter, Form, HTTPException, Request, Depends, Response
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from starlette.responses import RedirectResponse
 
 from app.config import settings
 from app.database import get_db
@@ -20,12 +22,27 @@ router = APIRouter(
 )
 
 @router.post("/verify_token", tags=["authenticate"])
-async def verify_token(token: str):
+async def verify_token(token: str, db: AsyncSession = Depends(get_db)):
     """
-
+    :param db:
     :param token:
     """
+    session_token = await db.execute(select(Session.user_id).where(Session.session_id == token))
+    user_id = session_token.scalar_one_or_none()
+    if user_id is None:
+        return RedirectResponse(url="/", status_code=302)
+    else :
+        user = await db.execute(select(User).where(User.id == user_id))
+        user = user.scalar_one_or_none()
+        if user is None:
+            return RedirectResponse(url="/", status_code=302)
 
+        return {
+            "email": user.email,
+            "display_name": user.display_name,
+            "family_name": user.family_name,
+            "avatar_url": user.avatar_url,
+        }
 
 
 @router.post("")
@@ -50,22 +67,8 @@ async def authenticate(
     try:
         if request.cookies.get("g_csrf_token") != g_csrf_token:
             raise HTTPException(status_code=400, detail="Invalid CSRF token")
-        # Specify the WEB_CLIENT_ID of the app that accesses the backend:
         # noinspection PyTypeChecker
         idinfo = id_token.verify_oauth2_token(credential, requests.Request(), settings.google_client_id)
-
-        # Or, if multiple clients access the backend server:
-        # idinfo = id_token.verify_oauth2_token(token, requests.Request())
-        # if idinfo['aud'] not in [WEB_CLIENT_ID_1, WEB_CLIENT_ID_2, WEB_CLIENT_ID_3]:
-        #     raise ValueError('Could not verify audience.')
-
-        # If the request specified a Google Workspace domain
-        # if idinfo['hd'] != DOMAIN_NAME:
-        #     raise ValueError('Wrong domain name.')
-
-        # ID token is valid. Get the user's Google Account ID from the decoded token.
-        # This ID is unique to each Google Account, making it suitable for use as a primary key
-        # during account lookup. Email is not a good choice because it can be changed by the user.
         userid = idinfo['sub']
         email = idinfo.get('email')
         name = idinfo.get('given_name')
@@ -98,6 +101,9 @@ async def authenticate(
             if token is None:
                 raise HTTPException(status_code=400, detail="Invalid session id, try logging in again")
 
+
+        response = RedirectResponse(url="/dashboard", status_code=302)
+
         response.set_cookie(
             "login_session",
             token,
@@ -106,15 +112,17 @@ async def authenticate(
             samesite="lax",
         )
 
+        response.set_cookie(
+            "user_name",
+            str(name) if name is not None else "Uživatel",
+            60 * 60 * 24 * 30,
+            samesite="lax",
+        )
+
+        return response
+
+
     except ValueError as e:
         # Invalid token
         raise HTTPException(status_code=400, detail=f"Invalid authentication token: {e}")
 
-
-
-    return {
-        "return": idinfo,
-        "stauts": "success",
-        "user_id": userid,
-        "email": email
-    }
