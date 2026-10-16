@@ -2,7 +2,7 @@
 Google oauth
 """
 
-from fastapi import APIRouter, Form, HTTPException, Request, Depends, Response
+from fastapi import APIRouter, Form, HTTPException, Request, Depends, Response, Cookie
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -21,40 +21,44 @@ router = APIRouter(
     tags=["authenticate"],
 )
 
-@router.post("/verify_token", tags=["authenticate"])
-async def verify_token(token: str, db: AsyncSession = Depends(get_db)):
+
+@router.post("/verify_user", tags=["authenticate"])
+async def verify_user(login_session: str | None = Cookie(default=None), db: AsyncSession = Depends(get_db)):
     """
+
+    :param login_session:
     :param db:
-    :param token:
+    :return:
     """
-    session_token = await db.execute(select(Session.user_id).where(Session.session_id == token))
+    if login_session is None:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    session_token = await db.execute(select(Session.user_id).where(Session.session_id == login_session))
     user_id = session_token.scalar_one_or_none()
     if user_id is None:
-        return RedirectResponse(url="/", status_code=302)
-    else :
-        user = await db.execute(select(User).where(User.id == user_id))
-        user = user.scalar_one_or_none()
-        if user is None:
-            return RedirectResponse(url="/", status_code=302)
+        raise HTTPException(status_code=401, detail="Not logged in")
 
-        return {
-            "email": user.email,
-            "display_name": user.display_name,
-            "family_name": user.family_name,
-            "avatar_url": user.avatar_url,
-        }
+    user = await db.execute(select(User).where(User.id == user_id))
+    user = user.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(status_code=401, detail="Not logged in")
+
+    return {
+        "email": user.email,
+        "display_name": user.display_name,
+        "family_name": user.family_name,
+        "avatar_url": user.avatar_url,
+    }
 
 
 @router.post("")
 async def authenticate(
-        response: Response,
         request: Request,
         credential: str = Form(...),
         g_csrf_token: str = Form(...),
         db: AsyncSession = Depends(get_db),
 ):
     """
-    :param response: fastapi response for setting cookies
     :param request: cookie request
     :param credential: return from Google oauth2 used for verifying user credentials
     :param g_csrf_token: return from Google oauth2 currently unused
@@ -101,7 +105,6 @@ async def authenticate(
             if token is None:
                 raise HTTPException(status_code=400, detail="Invalid session id, try logging in again")
 
-
         response = RedirectResponse(url="/dashboard", status_code=302)
 
         response.set_cookie(
@@ -125,4 +128,3 @@ async def authenticate(
     except ValueError as e:
         # Invalid token
         raise HTTPException(status_code=400, detail=f"Invalid authentication token: {e}")
-

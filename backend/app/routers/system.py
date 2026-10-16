@@ -1,3 +1,6 @@
+"""
+Environment healthcheck endpoint
+"""
 from fastapi import APIRouter
 from sqlalchemy import text
 
