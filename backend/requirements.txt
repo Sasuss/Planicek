@@ -5,3 +5,5 @@ asyncpg
 alembic
 pydantic-settings
 requests
+google-auth
+python-multipart
