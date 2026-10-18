@@ -50,14 +50,24 @@ function Dashboard() {
                 </div>
             </div>
 
-            <section className={"bg-green-500 absolute w-full h-100 bottom-0 p-8"} style={{ display: display}}>
-                <div className={"flex flex-row justify-between items-center"}>
-                    <Pfp avatar={data.avatar_url} setDisplay={setDisplay} />
-                    <div>
-                        <h3 className={"text-gray-950 font-bold text-lg"}>{data.display_name + " " + data.family_name}</h3>
-                        <span className={"text-gray-950 text-sm"}>{data.email}</span>
+            <section
+                className={"fixed inset-0 bg-black/50 flex-col justify-end z-50"}
+                style={{ display: display }}
+            >
+                <div className={"bg-white absolute w-full h-100 bottom-0 p-8 rounded border-t-2 border-black"}>
+                    <div className={"flex flex-row justify-between items-center"}>
+                        <Pfp avatar={data.avatar_url} />
+                        <div>
+                            <h3 className={"text-gray-950 font-bold text-lg"}>{data.display_name + " " + data.family_name}</h3>
+                            <span className={"text-gray-950 text-sm"}>{data.email}</span>
+                        </div>
+                        <button
+                            onClick={() => setDisplay("none")}
+                            className={"border-2 w-12 h-12 rounded-lg border-gray-400 cursor-pointer flex items-center justify-center font-bold text-grafit"}
+                        >
+                            X
+                        </button>
                     </div>
-                    <button className={"border-2 w-15 h-15 rounded-lg border-gray-400"}>X</button>
                 </div>
             </section>
         </>
