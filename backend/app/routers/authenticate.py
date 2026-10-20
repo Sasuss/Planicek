@@ -114,14 +114,14 @@ async def authenticate(
             httponly=True,
             samesite="lax",
         )
-
+        """
         response.set_cookie(
             "user_name",
             str(name) if name is not None else "Uživatel",
             60 * 60 * 24 * 30,
             samesite="lax",
         )
-
+        """
         return response
 
 

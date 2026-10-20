@@ -16,6 +16,7 @@ export default defineConfig({
         theme_color: '#ffffff',  // Color of the top bar
         background_color: '#ffffff',  // Splash screen background color
         display: 'standalone',  // Makes it look like a native app (hides browser UI)
+        icons: [],
       }
     }), tailwindcss(),
   ],
