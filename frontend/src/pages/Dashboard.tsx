@@ -52,7 +52,7 @@ function Dashboard() {
                             X
                         </button>
                     </div>
-                    <div className={"flex flex-row items-center border-t border-b border-gray-400 mt-5 py-3 active:bg-gray-300 select-none"}>
+                    <div className={"flex flex-row items-center border-t border-b border-gray-400 mt-5 py-3 active:bg-gray-300 select-none"} onClick={() => navigate("/settings")}>
                         <img src={settingsIcon} alt="Settings icon" className={"w-5 mr-5"}/>
                         <p className={"text-grafit font-bold text-xl"}>Nastavení</p>
                     </div>
@@ -60,6 +60,7 @@ function Dashboard() {
                         <img src={logoutIcon} alt="Settings icon" className={"w-5 mr-5"}/>
                         <p className={"text-grafit font-bold text-xl"}>Odhlásit se</p>
                     </div>
+
 
                 </div>
             </section>

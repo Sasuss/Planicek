@@ -31,6 +31,7 @@ html, body, #root {
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% Archivo, sans-serif;
+  font-weight: 500;
   letter-spacing: 0.18px;
   color-scheme: light dark;
   color: var(--text);
