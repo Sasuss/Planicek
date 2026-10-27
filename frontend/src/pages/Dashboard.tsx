@@ -33,6 +33,10 @@ function Dashboard() {
                 </div>
             </div>
 
+            <div>
+                <h2>Zatím nejsi v žádné skupině</h2>
+            </div>
+
             <section
                 className={"fixed inset-0 bg-black/50 justify-end z-50"}
                 style={{ display: display }}

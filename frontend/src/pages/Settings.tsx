@@ -1,6 +1,8 @@
 import ButtonLeft from "../components/ButtonLeft.tsx";
+import VerifyUser from "../features/VerifyUser.tsx";
 
 function Settings() {
+    VerifyUser();
     return (
         <div className="mx-5 my-10">
             <div className="flex items-center gap-3 mb-10">
@@ -19,6 +21,11 @@ function Settings() {
                 <div className="flex items-center gap-3">
                     <span className="text-lg text-gray-600">Placeholder</span>
                 </div>
+            </div>
+            <div>
+                <button>
+                    Smazat účet
+                </button>
             </div>
         </div>
     );

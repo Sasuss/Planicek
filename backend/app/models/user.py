@@ -18,4 +18,5 @@ class User(Base):
     family_name: Mapped[str|None] = mapped_column(String, nullable=True)
     avatar_url: Mapped[str|None] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now)
+    status: Mapped[str] = mapped_column(String, nullable=True, default="active")
 
