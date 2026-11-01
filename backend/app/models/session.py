@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import DateTime, String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from . import Base
+SESSION_LIFETIME = timedelta(days=30)
 
 
 class Session(Base):
@@ -15,7 +16,7 @@ class Session(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     session_id: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now)
-    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now() + timedelta(days=30))
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=lambda: datetime.now() + SESSION_LIFETIME)
 
 
 
