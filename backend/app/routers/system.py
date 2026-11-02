@@ -1,8 +1,8 @@
 """
 Environment healthcheck endpoint
 """
-from fastapi import APIRouter, Response, Depends, HTTPException
-from sqlalchemy import text
+from fastapi import APIRouter, Response, Depends, HTTPException, Cookie
+from sqlalchemy import text, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update
 
@@ -31,14 +31,19 @@ async def health() -> dict:
 
 
 @router.post("/logout", tags=["system"])
-async def logout(response: Response):
+async def logout(response: Response, db: AsyncSession = Depends(get_db), login_session: str | None = Cookie(default=None)):
     """
 
+    :param db:
     :param response:
     """
 
+    await db.execute(delete(Session).where(Session.session_id == login_session))
+    await db.commit()
     response.delete_cookie("login_session", httponly=True, samesite="lax", path="/")
     return {"success": True}
+
+
 
 async def delete_user(login_session, db: AsyncSession = Depends(get_db)):
     user_id = await db.execute(select(Session.user_id).where(Session.session_id == login_session))
