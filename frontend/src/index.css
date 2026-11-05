@@ -14,7 +14,7 @@ html, body, #root {
 }
 
 :root {
-  --text: #6b6375;
+  --text: #1F2937;
   --text-h: #08060d;
   --bg: #F2F2EE;
   --border: #e5e4e7;
@@ -98,3 +98,5 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+
