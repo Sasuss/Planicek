@@ -34,6 +34,7 @@ async def health() -> dict:
 async def logout(response: Response, db: AsyncSession = Depends(get_db), login_session: str | None = Cookie(default=None)):
     """
 
+    :param login_session:
     :param db:
     :param response:
     """
